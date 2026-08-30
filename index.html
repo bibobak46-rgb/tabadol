@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تبادل</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #222;
+    }
+
+    header {
+      background: #222;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      background: #222;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    .item {
+      background: white;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #ccc;
+    }
+
+    .item img {
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 8px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🔄 تبادل</h1>
+  <p>بدّل حاجتك بحاجة أخرى</p>
+</header>
+
+<div class="container">
+
+  <input
+    type="text"
+    id="search"
+    placeholder="🔎 قلب على حاجة..."
+    oninput="showItems()"
+  >
+
+  <h2>➕ أضف حاجة</h2>
+
+  <input
+    type="text"
+    id="name"
+    placeholder="شنو بغيتي تبدل؟"
+  >
+
+  <input
+    type="text"
+    id="description"
+    placeholder="وصف الحاجة"
+  >
+
+  <input
+    type="text"
+    id="image"
+    placeholder="رابط الصورة (اختياري)"
+  >
+
+  <button onclick="addItem()">أضف الحاجة</button>
+
+  <h2>الحاجات المعروضة</h2>
+
+  <div id="items"></div>
+
+</div>
+
+<script>
+  let items = JSON.parse(localStorage.getItem("tabadolItems")) || [];
+
+  function addItem() {
+    const name = document.getElementById("name").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const image = document.getElementById("image").value.trim();
+
+    if (!name) {
+      alert("كتب اسم الحاجة أولاً");
+      return;
+    }
+
+    items.push({
+      name: name,
+      description: description,
+      image: image
+    });
+
+    localStorage.setItem("tabadolItems", JSON.stringify(items));
+
+    document.getElementById("name").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("image").value = "";
+
+    showItems();
+  }
+
+  function showItems() {
+    const container = document.getElementById("items");
+    const search = document.getElementById("search").value.toLowerCase();
+
+    container.innerHTML = "";
+
+    const filtered = items.filter(item =>
+      item.name.toLowerCase().includes(search) ||
+      item.description.toLowerCase().includes(search)
+    );
+
+    if (filtered.length === 0) {
+      container.innerHTML =
+        '<div class="empty">ما كايناش حاجات دابا.</div>';
+      return;
+    }
+
+    filtered.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      div.innerHTML = `
+        ${item.image ? `<img src="${item.image}" alt="صورة">` : ""}
+        <h3>${item.name}</h3>
+        <p>${item.description}</p>
+      `;
+
+      container.appendChild(div);
+    });
+  }
+
+  showItems();
+</script>
+
+</body>
+</html>
